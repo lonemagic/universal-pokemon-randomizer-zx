@@ -124,7 +124,7 @@ public class Settings {
 
     // Evolutions
     public enum EvolutionsMod {
-        UNCHANGED, RANDOM, RANDOM_EVERY_LEVEL
+        UNCHANGED, RANDOM, RANDOM_EVERY_LEVEL, NONE
     }
 
     private EvolutionsMod evolutionsMod = EvolutionsMod.UNCHANGED;
@@ -474,10 +474,10 @@ public class Settings {
                 randomizeMoveCategory, correctStaticMusic));
 
         // 26 evolutions
-        out.write(makeByteSelected(evolutionsMod == EvolutionsMod.UNCHANGED, evolutionsMod == EvolutionsMod.RANDOM,
-                evosSimilarStrength, evosSameTyping, evosMaxThreeStages, evosForceChange, evosAllowAltFormes,
-                evolutionsMod == EvolutionsMod.RANDOM_EVERY_LEVEL));
-        
+        out.write(makeByteSelected(evolutionsMod == EvolutionsMod.UNCHANGED,
+                evolutionsMod == EvolutionsMod.RANDOM, evolutionsMod == EvolutionsMod.RANDOM_EVERY_LEVEL,
+                evolutionsMod == EvolutionsMod.NONE));
+        out.write(makeByteSelected(evolutionsMod == EvolutionsMod.NONE));
         // 27 pokemon trainer misc
         out.write(makeByteSelected(trainersUsePokemonOfSimilarStrength, 
                 rivalCarriesStarterThroughout,
@@ -582,6 +582,10 @@ public class Settings {
 
         // 50 elite four unique pokemon (3 bits)
         out.write(eliteFourUniquePokemonNumber);
+
+        //51 Evo stuff
+        out.write(makeByteSelected(evosSimilarStrength, evosSameTyping,
+                evosMaxThreeStages, evosForceChange, evosAllowAltFormes));
 
         try {
             byte[] romName = this.romName.getBytes("US-ASCII");
@@ -776,13 +780,9 @@ public class Settings {
 
         settings.setEvolutionsMod(restoreEnum(EvolutionsMod.class, data[26], 0, // UNCHANGED
                 1, // RANDOM
-                7 // RANDOM_EVERY_LEVEL
+                2, // RANDOM_EVERY_LEVEL
+                3  // NONE
         ));
-        settings.setEvosSimilarStrength(restoreState(data[26], 2));
-        settings.setEvosSameTyping(restoreState(data[26], 3));
-        settings.setEvosMaxThreeStages(restoreState(data[26], 4));
-        settings.setEvosForceChange(restoreState(data[26], 5));
-        settings.setEvosAllowAltFormes(restoreState(data[26],6));
 
         // new pokemon trainer misc
         settings.setTrainersUsePokemonOfSimilarStrength(restoreState(data[27], 0));
@@ -872,6 +872,12 @@ public class Settings {
         settings.setBanIrregularAltFormes(restoreState(data[49], 3));
 
         settings.setEliteFourUniquePokemonNumber(data[50] & 0x7);
+
+        settings.setEvosSimilarStrength(restoreState(data[51], 0));
+        settings.setEvosSameTyping(restoreState(data[51], 1));
+        settings.setEvosMaxThreeStages(restoreState(data[51], 2));
+        settings.setEvosForceChange(restoreState(data[51], 3));
+        settings.setEvosAllowAltFormes(restoreState(data[51],4));
 
         int romNameLength = data[LENGTH_OF_SETTINGS_DATA] & 0xFF;
         String romName = new String(data, LENGTH_OF_SETTINGS_DATA + 1, romNameLength, "US-ASCII");

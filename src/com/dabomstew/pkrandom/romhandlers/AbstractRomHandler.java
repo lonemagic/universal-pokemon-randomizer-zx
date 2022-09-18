@@ -5625,6 +5625,21 @@ public abstract class AbstractRomHandler implements RomHandler {
     }
 
     @Override
+    public void removeEvolutions(Settings settings) {
+
+        checkPokemonRestrictions();
+        List<Pokemon> pokemonPool;
+
+        pokemonPool = new ArrayList<>(mainPokemonListInclFormes);
+
+        for (Pokemon pk : pokemonPool) {
+            pk.evolutionsFrom.clear();
+            pk.evolutionsTo.clear();
+        }
+
+    }
+
+    @Override
     public void randomizeEvolutionsEveryLevel(Settings settings) {
         boolean sameType = settings.isEvosSameTyping();
         boolean forceChange = settings.isEvosForceChange();
